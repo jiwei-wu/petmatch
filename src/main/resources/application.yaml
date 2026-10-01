@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: petmatch
+  datasource:
+    url: jdbc:postgresql://localhost:5432/petmatch
+    username: petmatch
+    password: petmatch_dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

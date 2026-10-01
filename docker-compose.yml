@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: petmatch-db
+    environment:
+      POSTGRES_DB: petmatch
+      POSTGRES_USER: petmatch
+      POSTGRES_PASSWORD: petmatch_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
