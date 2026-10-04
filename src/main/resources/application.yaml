@@ -17,3 +17,7 @@ management:
     web:
       exposure:
         include: health
+
+jwt:
+  secret: this-is-a-temporary-dev-secret-key-change-me-later-32chars-min
+  expiration-minutes: 60
