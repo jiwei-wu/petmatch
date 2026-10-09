@@ -1,6 +1,12 @@
 package com.petmatch.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
+import java.time.OffsetDateTime;
 
 public class CreatePetPostRequest {
 
@@ -20,7 +26,7 @@ public class CreatePetPostRequest {
     private String description;
 
     @NotNull(message = "事发时间不能为空")
-    private String eventTime;
+    private OffsetDateTime eventTime;
 
     @NotNull(message = "纬度不能为空")
     @DecimalMin(value = "-90.0", message = "纬度范围不正确")
@@ -47,8 +53,8 @@ public class CreatePetPostRequest {
     public void setHasCollar(Boolean hasCollar) { this.hasCollar = hasCollar; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public String getEventTime() { return eventTime; }
-    public void setEventTime(String eventTime) { this.eventTime = eventTime; }
+    public OffsetDateTime getEventTime() { return eventTime; }
+    public void setEventTime(OffsetDateTime eventTime) { this.eventTime = eventTime; }
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }

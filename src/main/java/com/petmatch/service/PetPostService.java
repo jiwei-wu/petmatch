@@ -31,8 +31,8 @@ public class PetPostService {
                 request.getSize(),
                 request.getHasCollar(),
                 request.getDescription(),
-                null, // microchipHash：今天先不做芯片功能，留空
-                OffsetDateTime.parse(request.getEventTime()),
+                null, // microchipHash:芯片功能后面再做,先留空
+                request.getEventTime(),
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getPublicArea(),

@@ -80,6 +80,17 @@ class PetPostPrivacyIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
+    @Test
+    void createPost_withInvalidEventTime_returnsBadRequest() throws Exception {
+        String token = registerAndGetToken();
+        String badBody = POST_BODY.replace("2026-10-04T10:00:00+01:00", "not-a-date");
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/posts", HttpMethod.POST, new HttpEntity<>(badBody, authHeaders(token)), String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
     private String registerAndGetToken() throws Exception {
         String body = """
                 {"email":"%s","password":"password123","displayName":"Privacy Test User"}
