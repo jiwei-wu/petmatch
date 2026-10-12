@@ -55,8 +55,9 @@ class MatchGenerationIntegrationTest {
             // far/black/large/no collar/10 days later scores far below the threshold
             createPost(finderToken, "SIGHTING", species, "black", "large", false, t0.plusDays(10), 0.054);
 
-            // First run creates the two strong matches only
-            assertThat(matchService.generateMatchesFor(lostId)).isEqualTo(2);
+            // The background matcher creates the strong matches on its own: wait for it.
+            // Everything below then proves the stored result is stable and correct.
+            waitForMatchCount(lostId, 2);
 
             List<Long> sightingIds = jdbc.queryForList(
                     "SELECT sighting_post_id FROM matches WHERE lost_post_id = ?", Long.class, lostId);
@@ -89,6 +90,19 @@ class MatchGenerationIntegrationTest {
     }
 
     // ---------- helpers ----------
+
+    /** The listener runs asynchronously, so poll for up to ~10 seconds instead of asserting immediately. */
+    private void waitForMatchCount(long lostId, int expected) throws InterruptedException {
+        int last = -1;
+        for (int i = 0; i < 50; i++) {
+            last = countMatchesForLost(lostId);
+            if (last == expected) {
+                return;
+            }
+            Thread.sleep(200);
+        }
+        assertThat(last).as("matches for lost post %d", lostId).isEqualTo(expected);
+    }
 
     private int countMatchesForLost(long lostId) {
         Integer n = jdbc.queryForObject(

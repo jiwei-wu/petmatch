@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import com.petmatch.matching.PetPostCreatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +25,13 @@ public class PetPostController {
 
     private final PetPostService petPostService;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PetPostController(PetPostService petPostService, UserRepository userRepository) {
+    public PetPostController(PetPostService petPostService, UserRepository userRepository,
+                             ApplicationEventPublisher eventPublisher) {
         this.petPostService = petPostService;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     private Long currentUserId(Authentication authentication) {
@@ -42,6 +47,8 @@ public class PetPostController {
             Authentication authentication) {
         Long userId = currentUserId(authentication);
         PetPostResponse response = petPostService.createPost(userId, request);
+        // The post is already saved here, so the background matcher can see it
+        eventPublisher.publishEvent(new PetPostCreatedEvent(response.getId()));
         return ResponseEntity.ok(response);
     }
 
