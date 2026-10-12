@@ -10,4 +10,9 @@ public interface PetPostRepository extends JpaRepository<PetPost, Long> {
     Page<PetPost> findByStatus(PetPost.Status status, Pageable pageable);
 
     Page<PetPost> findByTypeAndStatus(PetPost.Type type, PetPost.Status status, Pageable pageable);
+
+    Page<PetPost> findByStatusAndSpeciesIgnoreCase(PetPost.Status status, String species, Pageable pageable);
+
+    Page<PetPost> findByTypeAndStatusAndSpeciesIgnoreCase(
+            PetPost.Type type, PetPost.Status status, String species, Pageable pageable);
 }

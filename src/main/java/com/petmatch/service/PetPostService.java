@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Locale;
 
 @Service
 public class PetPostService {
@@ -43,9 +44,22 @@ public class PetPostService {
         return toResponse(saved);
     }
 
-    public Page<PetPostResponse> listOpenPosts(Pageable pageable) {
-        return petPostRepository.findByStatus(PetPost.Status.OPEN, pageable)
-                .map(this::toResponse);
+    public Page<PetPostResponse> listOpenPosts(String type, String species, Pageable pageable) {
+        PetPost.Type typeFilter = parseType(type);
+        String speciesFilter = (species == null || species.isBlank()) ? null : species.trim();
+        PetPost.Status open = PetPost.Status.OPEN;
+
+        Page<PetPost> page;
+        if (typeFilter != null && speciesFilter != null) {
+            page = petPostRepository.findByTypeAndStatusAndSpeciesIgnoreCase(typeFilter, open, speciesFilter, pageable);
+        } else if (typeFilter != null) {
+            page = petPostRepository.findByTypeAndStatus(typeFilter, open, pageable);
+        } else if (speciesFilter != null) {
+            page = petPostRepository.findByStatusAndSpeciesIgnoreCase(open, speciesFilter, pageable);
+        } else {
+            page = petPostRepository.findByStatus(open, pageable);
+        }
+        return page.map(this::toResponse);
     }
 
     public PetPostResponse getPost(Long postId) {
@@ -63,6 +77,17 @@ public class PetPostService {
         }
 
         petPostRepository.delete(post);
+    }
+
+    private PetPost.Type parseType(String type) {
+        if (type == null || type.isBlank()) {
+            return null;
+        }
+        try {
+            return PetPost.Type.valueOf(type.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new AuthException("类型必须是 LOST 或 SIGHTING");
+        }
     }
 
     private PetPostResponse toResponse(PetPost post) {
