@@ -29,4 +29,10 @@ public interface MatchRepository extends Repository<PetPost, Long> {
             @Param("sightingId") Long sightingId,
             @Param("score") double score,
             @Param("breakdown") String breakdown);
+
+    @Query(value = """
+            SELECT id FROM matches
+            WHERE lost_post_id = :lostId AND sighting_post_id = :sightingId
+            """, nativeQuery = true)
+    Long findMatchId(@Param("lostId") Long lostId, @Param("sightingId") Long sightingId);
 }
