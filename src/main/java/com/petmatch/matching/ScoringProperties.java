@@ -21,6 +21,8 @@ public class ScoringProperties {
     private double colorWeight = 20;
     private double sizeWeight = 10;
     private double collarWeight = 10;
+    // ---- Persisted matches: only pairs scoring at least this much are stored (out of 100) ----
+    private double matchThreshold = 50;
 
     // ---- Distance: full score within 500 m, then the score halves every 500 m;
     //      the tolerated radius grows slowly as more days pass (heuristic) ----
@@ -120,4 +122,6 @@ public class ScoringProperties {
     public void setCollarBothNone(double v) { this.collarBothNone = v; }
     public double getCollarUnknown() { return collarUnknown; }
     public void setCollarUnknown(double v) { this.collarUnknown = v; }
+    public double getMatchThreshold() { return matchThreshold; }
+    public void setMatchThreshold(double v) { this.matchThreshold = v; }
 }

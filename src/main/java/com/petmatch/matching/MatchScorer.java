@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+
 /**
  * Pure calculation: scores one (lost post, sighting post) pair.
  * No database access; every parameter comes from ScoringProperties.
@@ -122,5 +125,24 @@ public class MatchScorer {
 
     private static double round(double v) {
         return Math.round(v * 10.0) / 10.0;
+    }
+
+        /**
+     * Score one row from the candidate query. The anchor post may be either the lost side
+     * or the sighting side, so this decides which is which before scoring.
+     */
+    public Result score(CandidateRow row) {
+        Side anchor = new Side(row.getAnchorColor(), row.getAnchorSize(),
+                row.getAnchorHasCollar(), toTime(row.getAnchorEpoch()));
+        Side candidate = new Side(row.getColor(), row.getSize(),
+                row.getHasCollar(), toTime(row.getEventEpoch()));
+        boolean anchorIsLost = "LOST".equals(row.getAnchorType());
+        return anchorIsLost
+                ? score(anchor, candidate, row.getDistanceMeters())
+                : score(candidate, anchor, row.getDistanceMeters());
+    }
+
+    public static OffsetDateTime toTime(Double epochSeconds) {
+        return OffsetDateTime.ofInstant(Instant.ofEpochMilli(Math.round(epochSeconds * 1000)), ZoneOffset.UTC);
     }
 }
