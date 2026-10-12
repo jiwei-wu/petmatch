@@ -3,11 +3,13 @@ package com.petmatch.service;
 import com.petmatch.domain.PetPost;
 import com.petmatch.dto.CreatePetPostRequest;
 import com.petmatch.dto.PetPostResponse;
+import com.petmatch.dto.UpdatePetPostRequest;
 import com.petmatch.exception.AuthException;
 import com.petmatch.repository.PetPostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Locale;
@@ -65,6 +67,27 @@ public class PetPostService {
     public PetPostResponse getPost(Long postId) {
         PetPost post = petPostRepository.findById(postId)
                 .orElseThrow(() -> new AuthException("帖子不存在"));
+        return toResponse(post);
+    }
+
+    @Transactional
+    public PetPostResponse updatePost(Long postId, Long requesterUserId, UpdatePetPostRequest request) {
+        PetPost post = petPostRepository.findById(postId)
+                .orElseThrow(() -> new AuthException("帖子不存在"));
+
+        if (!post.getUserId().equals(requesterUserId)) {
+            throw new AuthException("无权操作他人的帖子");
+        }
+
+        post.updateDetails(request.getColor(), request.getSize(), request.getHasCollar(), request.getDescription());
+
+        if (request.getStatus() != null) {
+            if (!"RESOLVED".equalsIgnoreCase(request.getStatus().trim())) {
+                throw new AuthException("状态目前只能改为 RESOLVED(已找回)");
+            }
+            post.markResolved();
+        }
+
         return toResponse(post);
     }
 

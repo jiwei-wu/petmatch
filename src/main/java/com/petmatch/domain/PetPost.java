@@ -2,7 +2,6 @@ package com.petmatch.domain;
 
 import jakarta.persistence.*;
 
-
 import java.time.OffsetDateTime;
 
 @Entity
@@ -42,12 +41,12 @@ public class PetPost {
     @Column(name = "event_time", nullable = false)
     private OffsetDateTime eventTime;
 
-   @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
     @Column(name = "longitude", nullable = false)
     private Double longitude;
-    
+
     @Column(name = "public_area", nullable = false)
     private String publicArea;
 
@@ -65,9 +64,9 @@ public class PetPost {
     }
 
     public PetPost(Long userId, Type type, String species, String color, String size,
-                Boolean hasCollar, String description, String microchipHash,
-                OffsetDateTime eventTime, Double latitude, Double longitude, String publicArea,
-                OffsetDateTime expiresAt) {
+                   Boolean hasCollar, String description, String microchipHash,
+                   OffsetDateTime eventTime, Double latitude, Double longitude, String publicArea,
+                   OffsetDateTime expiresAt) {
         this.userId = userId;
         this.type = type;
         this.species = species;
@@ -103,7 +102,23 @@ public class PetPost {
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getExpiresAt() { return expiresAt; }
 
-    // 状态变更的专用方法(不是无脑 setter)
+    // 只允许修改"描述性"字段;传 null 表示这一项保持不变
+    public void updateDetails(String color, String size, Boolean hasCollar, String description) {
+        if (color != null) {
+            this.color = color;
+        }
+        if (size != null) {
+            this.size = size;
+        }
+        if (hasCollar != null) {
+            this.hasCollar = hasCollar;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+    }
+
+    // methods to change status
     public void markResolved() {
         this.status = Status.RESOLVED;
     }

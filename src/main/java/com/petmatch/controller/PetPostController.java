@@ -2,6 +2,7 @@ package com.petmatch.controller;
 
 import com.petmatch.dto.CreatePetPostRequest;
 import com.petmatch.dto.PetPostResponse;
+import com.petmatch.dto.UpdatePetPostRequest;
 import com.petmatch.exception.AuthException;
 import com.petmatch.repository.UserRepository;
 import com.petmatch.service.PetPostService;
@@ -59,6 +60,15 @@ public class PetPostController {
     @GetMapping("/{id}")
     public ResponseEntity<PetPostResponse> getPost(@PathVariable Long id) {
         return ResponseEntity.ok(petPostService.getPost(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PetPostResponse> updatePost(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdatePetPostRequest request,
+            Authentication authentication) {
+        Long userId = currentUserId(authentication);
+        return ResponseEntity.ok(petPostService.updatePost(id, userId, request));
     }
 
     @DeleteMapping("/{id}")
