@@ -126,25 +126,15 @@ docker compose up -d
 
 The app listens on `http://localhost:8080`. The default database settings and JWT secret in `application.yaml` are **for local development only**; override them with environment variables for anything else.
 
-### Try it
+### See it work
+
+With the app running, this script plays out a full story: two people register, one reports a lost cat, the other reports a sighting nearby, the match appears, both are notified, and a contact request is sent and accepted.
 
 ```bash
-# Register and keep the token
-TOKEN=$(curl -s -X POST localhost:8080/api/auth/register \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"demo@example.com","password":"password123","displayName":"Demo"}' \
-  | sed -E 's/.*"token":"([^"]+)".*/\1/')
-
-# Report a lost cat
-curl -s -X POST localhost:8080/api/posts \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"type":"LOST","species":"cat","color":"orange","size":"medium",
-       "hasCollar":true,"description":"Friendly, answers to Milo",
-       "eventTime":"2026-10-10T09:00:00+01:00",
-       "latitude":53.3498,"longitude":-6.2603,"publicArea":"Dublin 1"}'
+./scripts/demo.sh
 ```
 
-When someone else posts a matching sighting nearby, both of you get a notification, and the match shows up under `GET /api/matches`.
+It prints the JSON responses at each step, so you can see for yourself that coordinates never appear and that the other person's email stays hidden until the request is accepted. It needs only `curl` and `python3`.
 
 ## Tests
 
