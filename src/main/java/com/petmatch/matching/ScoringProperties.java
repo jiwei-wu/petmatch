@@ -16,9 +16,9 @@ import java.util.Map;
 public class ScoringProperties {
 
     // ---- Weights (ideally sum to 100; initial assumptions, to be tuned later with simulated data) ----
-    private double distanceWeight = 40;
-    private double timeWeight = 20;
-    private double colorWeight = 20;
+    private double distanceWeight = 25;
+    private double timeWeight = 25;
+    private double colorWeight = 30;
     private double sizeWeight = 10;
     private double collarWeight = 10;
     // ---- Persisted matches: only pairs scoring at least this much are stored (out of 100) ----
