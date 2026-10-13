@@ -26,6 +26,22 @@ Lost-pet posts are scattered across social media, where they are hard to search 
 - **Contact requests**: the other person's email is revealed only after they accept.
 - A nightly job that **expires old posts** and enforces **data retention**.
 
+## Demo
+
+Output of `./scripts/demo.sh`, trimmed to the three moments that matter.
+
+**1. A match appears, with an explainable score and only public fields of the other post**
+
+![Match with score breakdown](docs/images/01-match.png)
+
+**2. The contact request is pending: the email is still hidden**
+
+![Contact email is null while pending](docs/images/02-hidden-contact.png)
+
+**3. After the owner accepts, and only then, both sides see each other's email**
+
+![Emails revealed after acceptance](docs/images/03-after-accept.png)
+
 ## Architecture
 
 ```mermaid
