@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.petmatch.dto.CreatePetPostRequest;
 import com.petmatch.dto.PetPostResponse;
 import com.petmatch.dto.UpdatePetPostRequest;
@@ -17,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Posts", description = "Lost-pet reports and sightings. Exact coordinates are stored but never returned")
 @RestController
 @RequestMapping("/api/posts")
 public class PetPostController {
@@ -41,6 +44,7 @@ public class PetPostController {
                 .getId();
     }
 
+    @Operation(summary = "Create a post", description = "Requires login. The exact location is stored for matching but is never returned by any endpoint. Matching against existing posts starts in the background.")
     @PostMapping
     public ResponseEntity<PetPostResponse> createPost(
             @Valid @RequestBody CreatePetPostRequest request,
@@ -52,6 +56,7 @@ public class PetPostController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "List open posts", description = "Public. Filter by type and species (case-insensitive). Page size is capped. Responses contain only the public area, never coordinates or user ids.")
     @GetMapping
     public ResponseEntity<Page<PetPostResponse>> listPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -64,11 +69,13 @@ public class PetPostController {
         return ResponseEntity.ok(petPostService.listOpenPosts(type, species, pageable));
     }
 
+    @Operation(summary = "Get one post", description = "Public. No coordinates and no user id in the response.")
     @GetMapping("/{id}")
     public ResponseEntity<PetPostResponse> getPost(@PathVariable Long id) {
         return ResponseEntity.ok(petPostService.getPost(id));
     }
 
+    @Operation(summary = "Update your post", description = "Owner only. Only descriptive fields can be changed, and status can only be set to RESOLVED.")
     @PutMapping("/{id}")
     public ResponseEntity<PetPostResponse> updatePost(
             @PathVariable Long id,
@@ -78,6 +85,7 @@ public class PetPostController {
         return ResponseEntity.ok(petPostService.updatePost(id, userId, request));
     }
 
+    @Operation(summary = "Delete your post", description = "Owner only. Matches and contact requests that involve the post are deleted with it.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id, Authentication authentication) {
         Long userId = currentUserId(authentication);

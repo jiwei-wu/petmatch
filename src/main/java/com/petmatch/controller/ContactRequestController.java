@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.petmatch.dto.ContactRequestResponse;
 import com.petmatch.dto.CreateContactRequest;
 import com.petmatch.exception.AuthException;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "Contact requests", description = "Contact details are shared only after both sides agree")
 @RestController
 @RequestMapping("/api")
 public class ContactRequestController {
@@ -30,6 +33,7 @@ public class ContactRequestController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Ask to get in touch", description = "Sends a short message to the other side of a match. One request per person per match. No email is visible yet.")
     @PostMapping("/matches/{matchId}/contact-requests")
     public ResponseEntity<ContactRequestResponse> create(
             @PathVariable Long matchId,
@@ -40,17 +44,20 @@ public class ContactRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @Operation(summary = "My contact requests", description = "Sent and received requests. contactEmail is filled in only after the request is accepted, otherwise it is null.")
     @GetMapping("/contact-requests")
     public ResponseEntity<List<ContactRequestResponse>> mine(Authentication authentication) {
         return ResponseEntity.ok(contactService.listMine(currentUserId(authentication)));
     }
 
+    @Operation(summary = "Accept a request", description = "Only the recipient can accept. After this, both sides can see each other's email.")
     @PostMapping("/contact-requests/{id}/accept")
     public ResponseEntity<Void> accept(@PathVariable Long id, Authentication authentication) {
         contactService.decide(id, currentUserId(authentication), true);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Decline a request", description = "Only the recipient can decline. No email is ever revealed.")
     @PostMapping("/contact-requests/{id}/decline")
     public ResponseEntity<Void> decline(@PathVariable Long id, Authentication authentication) {
         contactService.decide(id, currentUserId(authentication), false);

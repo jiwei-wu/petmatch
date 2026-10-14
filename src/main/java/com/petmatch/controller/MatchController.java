@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.petmatch.dto.MatchResponse;
 import com.petmatch.exception.AuthException;
 import com.petmatch.matching.MatchRow;
@@ -21,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Matches", description = "Persisted matches between a lost report and a sighting")
 @RestController
 @RequestMapping("/api/matches")
 public class MatchController {
@@ -35,6 +38,7 @@ public class MatchController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "My matches", description = "Matches that involve one of your posts, with score, breakdown and only the public fields of the other post.")
     @GetMapping
     public ResponseEntity<List<MatchResponse>> myMatches(Authentication authentication) {
         Long userId = currentUserId(authentication);
@@ -45,12 +49,14 @@ public class MatchController {
         return ResponseEntity.ok(body);
     }
 
+    @Operation(summary = "Confirm a match", description = "Marks a suggested match as confirmed. A match that is not yours is reported as not found.")
     @PostMapping("/{id}/confirm")
     @Transactional
     public ResponseEntity<Void> confirm(@PathVariable Long id, Authentication authentication) {
         return changeStatus(id, authentication, "CONFIRMED");
     }
 
+    @Operation(summary = "Dismiss a match", description = "Marks a suggested match as dismissed. A match that is not yours is reported as not found.")
     @PostMapping("/{id}/dismiss")
     @Transactional
     public ResponseEntity<Void> dismiss(@PathVariable Long id, Authentication authentication) {

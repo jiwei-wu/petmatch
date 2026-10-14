@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.petmatch.dto.CandidateResponse;
 import com.petmatch.exception.AuthException;
 import com.petmatch.repository.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "Matching", description = "Preview of likely matches for one of your posts")
 @RestController
 @RequestMapping("/api/matching")
 public class CandidateController {
@@ -25,6 +28,7 @@ public class CandidateController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Top candidates for my post", description = "Owner only. Up to 5 best candidates with an explainable score breakdown. Distance is shown only as a coarse band. A post that is not yours is reported as not found.")
     @GetMapping("/posts/{id}/candidates")
     public ResponseEntity<List<CandidateResponse>> candidates(
             @PathVariable Long id, Authentication authentication) {

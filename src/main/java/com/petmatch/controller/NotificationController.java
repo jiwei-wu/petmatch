@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.petmatch.dto.NotificationResponse;
 import com.petmatch.exception.AuthException;
 import com.petmatch.matching.MatchScorer;
@@ -19,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Tag(name = "Notifications", description = "In-app notifications about your own posts")
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
@@ -33,6 +36,7 @@ public class NotificationController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "My notifications", description = "Latest notifications for the logged-in user. They never contain the other person's identity.")
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> myNotifications(Authentication authentication) {
         Long userId = currentUserId(authentication);
@@ -43,6 +47,7 @@ public class NotificationController {
         return ResponseEntity.ok(body);
     }
 
+    @Operation(summary = "Mark a notification as read", description = "A notification that is not yours is reported as not found.")
     @PostMapping("/{id}/read")
     @Transactional
     public ResponseEntity<Void> markRead(@PathVariable Long id, Authentication authentication) {
