@@ -37,7 +37,7 @@ public class PetPostController {
     private Long currentUserId(Authentication authentication) {
         String email = authentication.getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthException("用户不存在"))
+                .orElseThrow(() -> new AuthException("User not found"))
                 .getId();
     }
 

@@ -6,15 +6,15 @@ import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
 
-    @NotBlank(message = "邮箱不能为空")
-    @Email(message = "邮箱格式不正确")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email format is invalid")
     private String email;
 
-    @NotBlank(message = "密码不能为空")
-    @Size(min = 8, message = "密码长度至少 8 位")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotBlank(message = "昵称不能为空")
+    @NotBlank(message = "Display name is required")
     private String displayName;
 
     public String getEmail() { return email; }

@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(FieldError::getDefaultMessage)
-                .orElse("请求参数有误");
+                .orElse("Invalid request parameters");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(message));
@@ -34,6 +34,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("请求内容格式不正确,请检查日期(例如 2026-10-04T10:00:00+01:00)和各字段类型"));
+                .body(new ErrorResponse("Malformed request body: check the date format (for example 2026-10-04T10:00:00+01:00) and the field types"));
     }
 }

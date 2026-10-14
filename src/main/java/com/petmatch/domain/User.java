@@ -27,7 +27,7 @@ public class User {
     private OffsetDateTime deletedAt;
 
     protected User() {
-        // JPA 要求有一个无参构造方法
+        // JPA requires a no-argument constructor
     }
 
     public User(String email, String passwordHash, String displayName) {

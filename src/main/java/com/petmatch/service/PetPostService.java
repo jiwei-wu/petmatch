@@ -34,7 +34,7 @@ public class PetPostService {
                 request.getSize(),
                 request.getHasCollar(),
                 request.getDescription(),
-                null, // microchipHash:芯片功能后面再做,先留空
+                null, // microchipHash: microchip matching comes later, left empty for now
                 request.getEventTime(),
                 request.getLatitude(),
                 request.getLongitude(),
@@ -66,24 +66,24 @@ public class PetPostService {
 
     public PetPostResponse getPost(Long postId) {
         PetPost post = petPostRepository.findById(postId)
-                .orElseThrow(() -> new AuthException("帖子不存在"));
+                .orElseThrow(() -> new AuthException("Post not found"));
         return toResponse(post);
     }
 
     @Transactional
     public PetPostResponse updatePost(Long postId, Long requesterUserId, UpdatePetPostRequest request) {
         PetPost post = petPostRepository.findById(postId)
-                .orElseThrow(() -> new AuthException("帖子不存在"));
+                .orElseThrow(() -> new AuthException("Post not found"));
 
         if (!post.getUserId().equals(requesterUserId)) {
-            throw new AuthException("无权操作他人的帖子");
+            throw new AuthException("You cannot modify another user's post");
         }
 
         post.updateDetails(request.getColor(), request.getSize(), request.getHasCollar(), request.getDescription());
 
         if (request.getStatus() != null) {
             if (!"RESOLVED".equalsIgnoreCase(request.getStatus().trim())) {
-                throw new AuthException("状态目前只能改为 RESOLVED(已找回)");
+                throw new AuthException("Status can currently only be changed to RESOLVED");
             }
             post.markResolved();
         }
@@ -93,10 +93,10 @@ public class PetPostService {
 
     public void deletePost(Long postId, Long requesterUserId) {
         PetPost post = petPostRepository.findById(postId)
-                .orElseThrow(() -> new AuthException("帖子不存在"));
+                .orElseThrow(() -> new AuthException("Post not found"));
 
         if (!post.getUserId().equals(requesterUserId)) {
-            throw new AuthException("无权操作他人的帖子");
+            throw new AuthException("You cannot modify another user's post");
         }
 
         petPostRepository.delete(post);
@@ -109,7 +109,7 @@ public class PetPostService {
         try {
             return PetPost.Type.valueOf(type.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new AuthException("类型必须是 LOST 或 SIGHTING");
+            throw new AuthException("Type must be LOST or SIGHTING");
         }
     }
 

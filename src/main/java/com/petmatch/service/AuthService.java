@@ -28,7 +28,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new AuthException("该邮箱已被注册");
+            throw new AuthException("Email already registered");
         }
 
         String hashedPassword = passwordEncoder.encode(request.getPassword());
@@ -41,10 +41,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new AuthException("邮箱或密码错误"));
+                .orElseThrow(() -> new AuthException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new AuthException("邮箱或密码错误");
+            throw new AuthException("Invalid email or password");
         }
 
         String token = jwtService.generateToken(user);

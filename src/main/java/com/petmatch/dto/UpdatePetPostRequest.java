@@ -4,15 +4,15 @@ import jakarta.validation.constraints.Size;
 
 public class UpdatePetPostRequest {
 
-    @Size(max = 50, message = "毛色不能超过 50 个字符")
+    @Size(max = 50, message = "Colour must be at most 50 characters")
     private String color;
 
-    @Size(max = 20, message = "体型不能超过 20 个字符")
+    @Size(max = 20, message = "Size must be at most 20 characters")
     private String size;
 
     private Boolean hasCollar;
 
-    @Size(max = 2000, message = "描述不能超过 2000 个字符")
+    @Size(max = 2000, message = "Description must be at most 2000 characters")
     private String description;
 
     private String status;

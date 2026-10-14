@@ -10,11 +10,11 @@ import java.time.OffsetDateTime;
 
 public class CreatePetPostRequest {
 
-    @NotBlank(message = "帖子类型不能为空")
-    @Pattern(regexp = "LOST|SIGHTING", message = "类型必须是 LOST 或 SIGHTING")
+    @NotBlank(message = "Post type is required")
+    @Pattern(regexp = "LOST|SIGHTING", message = "Type must be LOST or SIGHTING")
     private String type;
 
-    @NotBlank(message = "物种不能为空")
+    @NotBlank(message = "Species is required")
     private String species;
 
     private String color;
@@ -25,20 +25,20 @@ public class CreatePetPostRequest {
 
     private String description;
 
-    @NotNull(message = "事发时间不能为空")
+    @NotNull(message = "Event time is required")
     private OffsetDateTime eventTime;
 
-    @NotNull(message = "纬度不能为空")
-    @DecimalMin(value = "-90.0", message = "纬度范围不正确")
-    @DecimalMax(value = "90.0", message = "纬度范围不正确")
+    @NotNull(message = "Latitude is required")
+    @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
+    @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
     private Double latitude;
 
-    @NotNull(message = "经度不能为空")
-    @DecimalMin(value = "-180.0", message = "经度范围不正确")
-    @DecimalMax(value = "180.0", message = "经度范围不正确")
+    @NotNull(message = "Longitude is required")
+    @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
+    @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
 
-    @NotBlank(message = "区域不能为空")
+    @NotBlank(message = "Public area is required")
     private String publicArea;
 
     public String getType() { return type; }

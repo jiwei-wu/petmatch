@@ -102,7 +102,7 @@ public class PetPost {
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getExpiresAt() { return expiresAt; }
 
-    // 只允许修改"描述性"字段;传 null 表示这一项保持不变
+    // Only descriptive fields may be changed; null means leave that field unchanged
     public void updateDetails(String color, String size, Boolean hasCollar, String description) {
         if (color != null) {
             this.color = color;

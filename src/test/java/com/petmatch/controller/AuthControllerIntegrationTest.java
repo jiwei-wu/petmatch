@@ -32,7 +32,7 @@ class AuthControllerIntegrationTest {
     void register_thenLogin_thenAccessProtectedEndpoint_shouldSucceed() throws Exception {
         String email = randomEmail();
 
-        // 1. 注册
+        // 1. Register
         String registerBody = """
                 {"email":"%s","password":"password123","displayName":"Integration Test User"}
                 """.formatted(email);
@@ -51,7 +51,7 @@ class AuthControllerIntegrationTest {
         assertThat(registerJson.get("email").asText()).isEqualTo(email);
         assertThat(registerJson.get("token").asText()).isNotBlank();
 
-        // 2. 用同一邮箱重复注册,应该被拒绝
+        // 2. Registering again with the same email should be rejected
         ResponseEntity<String> duplicateResponse = restTemplate.postForEntity(
                 "/api/auth/register",
                 new HttpEntity<>(registerBody, headers),
@@ -59,7 +59,7 @@ class AuthControllerIntegrationTest {
         );
         assertThat(duplicateResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        // 3. 登录
+        // 3. Log in
         String loginBody = """
                 {"email":"%s","password":"password123"}
                 """.formatted(email);
@@ -75,7 +75,7 @@ class AuthControllerIntegrationTest {
         String token = loginJson.get("token").asText();
         assertThat(token).isNotBlank();
 
-        // 4. 密码错误应该被拒绝
+        // 4. A wrong password should be rejected
         String wrongPasswordBody = """
                 {"email":"%s","password":"wrongpassword"}
                 """.formatted(email);
@@ -87,11 +87,11 @@ class AuthControllerIntegrationTest {
         );
         assertThat(wrongLoginResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        // 5. 不带 token 访问受保护接口,应该被拒绝
+        // 5. Calling a protected endpoint without a token should be rejected
         ResponseEntity<String> noAuthResponse = restTemplate.getForEntity("/api/me", String.class);
         assertThat(noAuthResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
-        // 6. 带着登录拿到的 token 访问受保护接口,应该成功并识别出正确的用户
+        // 6. Calling a protected endpoint with the login token should succeed and identify the right user
         HttpHeaders authHeaders = new HttpHeaders();
         authHeaders.set("Authorization", "Bearer " + token);
 
