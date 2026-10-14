@@ -64,7 +64,7 @@ echo
 echo "== 4. Matching runs in the background; wait for the match to appear"
 MATCH_ID=""
 for _ in $(seq 1 25); do
-  MATCH_ID=$(api "$OWNER" GET /api/matches | field "next((m['matchId'] for m in d if m['myPostId'] == $LOST_ID), '')")
+    MATCH_ID=$(api "$OWNER" GET /api/matches | field "next((m['matchId'] for m in d if m['myPostId'] == $LOST_ID and m['otherPostId'] == $SEEN_ID), '')")
   [ -n "$MATCH_ID" ] && break
   sleep 0.4
 done
