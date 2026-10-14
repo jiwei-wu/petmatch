@@ -83,9 +83,9 @@ Matching is split in two on purpose.
 
 | Factor | Weight | Rule |
 |---|---|---|
-| Distance | 40 | Full score within 500 m, then halves every 500 m; the tolerated radius grows slowly the longer the pet has been missing (capped). |
-| Time | 20 | Halves every 7 days between loss and sighting. |
-| Colour | 20 | Synonym normalisation plus a hand-built similarity table; unknown colours get a neutral score. |
+| Distance | 25 | Full score within 500 m, then halves every 500 m; the tolerated radius grows slowly the longer the pet has been missing (capped). |
+| Time | 25 | Halves every 7 days between loss and sighting. |
+| Colour | 30 | Synonym normalisation plus a hand-built similarity table; unknown colours get a neutral score. |
 | Size | 10 | Same bucket 1.0, adjacent 0.5, otherwise 0. |
 | Collar | 10 | Asymmetric: "owner says collar, finder saw none" is more plausible than the reverse. |
 
@@ -93,7 +93,23 @@ Missing fields get a neutral score instead of crashing or being punished.
 
 **All numbers live in one class, `ScoringProperties`**, and can be overridden in `application.yaml` under `petmatch.scoring.*`. The logic in `MatchScorer` never needs to change when you tune a parameter, and there is a unit test that proves this.
 
-> **Honest note on the parameters.** The weights and decay rates are initial assumptions, loosely informed by a published study of ~1,200 lost cats (Huang et al., 2018, *Animals* 8(1):5), which found most cats are recovered close to home. That study measured distance from *home*, not from a sighting, and only covers recovered cats, so it cannot validate these numbers. They are meant to be evaluated and tuned against simulated data (see the roadmap).
+### Evaluation on simulated data
+
+There is no real data yet, so the matching model is evaluated on synthetic lost/sighting pairs: 2,000 lost cats, each with one true sighting hidden among about 30 look-alike distractors, where the true sighting may be reported with the wrong colour, the wrong size, or no collar noticed. Run it with `./mvnw -Dtest=MatchingEvaluationTest test`.
+
+With the initial weights (40/20/20/10/10), in the baseline simulated world:
+
+| Ranking | top-1 | top-5 |
+|---|---|---|
+| Random guess | 3.2% | 16.1% |
+| Nearest sighting first | 55.9% | 73.6% |
+| Weighted score | 61.3% | 79.6% |
+
+Removing colour or time costs about 14 points of top-1; removing size or collar costs only 1 to 2 points.
+
+**Retuning.** The same simulation showed that a distance weight of 40 was too high: when the true sighting is not very close, the distance term pushes it down the list. Rather than picking whatever scores best in one simulated world, the weights were compared across four worlds (baseline, more spread-out sightings, sloppier witnesses, more distractors) using random seeds that were not used while exploring (`WeightRobustnessTest`). The current 25/25/30/10/10 had the best worst-case result: on held-out seeds, the worst-world MRR rose from 0.52 to 0.64, and top-5 in the spread-out world from 59% to 85%.
+
+> **Honest note.** All of this is simulated data built from my own assumptions, so it shows robustness to noisy reports, not real-world accuracy. Only the weights were tuned; the decay rates (500 m, 7 days) are still initial assumptions, loosely informed by a study of ~1,200 lost cats (Huang et al., 2018, *Animals* 8(1):5). That study measured distance from *home* and only covers recovered cats, so it cannot validate these numbers. Real feedback (confirmed and dismissed matches) is the proper next source of tuning data.
 
 ## Privacy by design
 
@@ -180,10 +196,12 @@ Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 
 ## Roadmap
 
-- [ ] Simulated-data generator and a matching evaluation (top-1 / top-3 / top-5 hit rate), then tune the weights
+- [x] Simulated-data generator and a matching evaluation (top-1 / top-3 / top-5 hit rate), then tune the weights
+- [ ] Tune the decay rates (500 m, 7 days) and re-check the weights on real feedback
 - [ ] Exact match on a hashed microchip number
 - [ ] OpenAPI / Swagger documentation
-- [ ] Testcontainers, GitHub Actions CI, Dockerfile and a deployed demo
+- [x] Dockerfile and one-command startup with `docker compose up --build`
+- [ ] Testcontainers, GitHub Actions CI and a deployed demo
 - [ ] Image upload with EXIF stripping
 - [ ] Rate limiting and abuse reporting
 
