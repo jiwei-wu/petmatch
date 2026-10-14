@@ -9,21 +9,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgis/postgis:16-3.4
-        env:
-          POSTGRES_DB: petmatch
-          POSTGRES_USER: petmatch
-          POSTGRES_PASSWORD: petmatch_dev
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U petmatch -d petmatch"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-
     steps:
       - uses: actions/checkout@v4
 
@@ -33,5 +18,7 @@ jobs:
           java-version: 21
           cache: maven
 
+      # The integration tests start their own PostGIS container (Testcontainers),
+      # so no database service is configured here.
       - name: Build and test
         run: ./mvnw -B verify
