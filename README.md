@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/jiwei-wu/petmatch/actions/workflows/ci.yml/badge.svg)](https://github.com/jiwei-wu/petmatch/actions/workflows/ci.yml)
 
-
 A backend that helps reunite lost pets with the people who spotted them. Owners post a **lost** report, passers-by post a **sighting**, and PetMatch finds the likely pairs: it filters by species, place and time with PostGIS, scores each pair with an explainable model, and tells both sides when a strong match appears.
 
 It is built **privacy-first**: exact locations never leave the database, contact details are revealed only after both people agree, and data is deleted on a schedule.
