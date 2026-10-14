@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import com.petmatch.TestcontainersConfiguration;
+import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureTestRestTemplate
 class ContactRequestIntegrationTest {
 

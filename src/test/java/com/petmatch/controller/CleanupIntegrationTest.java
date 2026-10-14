@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import com.petmatch.TestcontainersConfiguration;
+import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petmatch.service.CleanupService;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Old data is faked by moving timestamps back with SQL, because the API cannot create expired posts.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureTestRestTemplate
 class CleanupIntegrationTest {
 

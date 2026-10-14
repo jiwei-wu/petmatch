@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import com.petmatch.TestcontainersConfiguration;
+import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *   +0.0018 deg is about 200 m, +0.0135 deg about 1.5 km, +0.054 deg about 6 km, +0.135 deg about 15 km.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureTestRestTemplate
 class CandidateIntegrationTest {
 

@@ -1,5 +1,7 @@
 package com.petmatch.controller;
 
+import com.petmatch.TestcontainersConfiguration;
+import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /** Creating posts through the API should produce matches in the background, with no manual call. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureTestRestTemplate
 class AutoMatchIntegrationTest {
 
