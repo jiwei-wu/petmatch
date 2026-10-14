@@ -44,6 +44,10 @@ Output of `./scripts/demo.sh`, trimmed to the three moments that matter.
 
 ![Emails revealed after acceptance](docs/images/03-after-accept.png)
 
+**4. Interactive API docs (Swagger UI), with the privacy rules written into each endpoint**
+
+![Swagger UI](docs/images/04-swagger.png)
+
 ## Architecture
 
 ```mermaid
@@ -159,6 +163,12 @@ docker compose up -d
 ```
 
 The app listens on `http://localhost:8080`. The default database settings and JWT secret in `application.yaml` are **for local development only**; override them with environment variables for anything else.
+
+### API documentation
+
+With the app running, open **http://localhost:8080/swagger-ui.html** for interactive API docs. Every endpoint has a short description that includes its privacy rules.
+
+To try the protected endpoints from the page: call `POST /api/auth/register` (or `/api/auth/login`), copy the `token` from the response, click **Authorize**, and paste it. The raw OpenAPI document is at `/v3/api-docs`.
 
 ### See it work
 
