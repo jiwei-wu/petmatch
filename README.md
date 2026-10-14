@@ -186,8 +186,11 @@ It prints the JSON responses at each step, so you can see for yourself that coor
 ./mvnw clean test
 ```
 
+Docker must be running: the integration tests start their own throw-away PostGIS container (Testcontainers), so there is nothing to set up and your development data is never touched. The first test class pays the container start-up cost once; the rest share it.
+
 - **Unit tests** for the scoring model (no Spring, no database, run in milliseconds).
 - **End-to-end integration tests** against a real PostgreSQL/PostGIS: authentication, post lifecycle, privacy guarantees, candidate ranking and hard filters, background matching, notifications, confirm / dismiss, the contact-request consent flow, and the cleanup job.
+- **Simulated-data evaluation** of the matching model (`MatchingEvaluationTest`, `WeightRobustnessTest`): ablations, a nearest-first baseline, and a weight check across several simulated worlds. See "Evaluation on simulated data" above.
 
 Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 
@@ -201,8 +204,7 @@ Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 
 ## Limitations (known and deliberate)
 
-- Scoring parameters are assumptions, not fitted values (see the note above).
-- Tests currently share one development database; they use random data to stay isolated. Throw-away containers are planned.
+- Scoring parameters were checked and tuned on simulated data only, not fitted to real data (see "Evaluation on simulated data").
 - The cleanup scheduler assumes a single running instance.
 - No rate limiting, e-mail delivery or image uploads yet.
 
@@ -211,9 +213,11 @@ Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 - [x] Simulated-data generator and a matching evaluation (top-1 / top-3 / top-5 hit rate), then tune the weights
 - [ ] Tune the decay rates (500 m, 7 days) and re-check the weights on real feedback
 - [ ] Exact match on a hashed microchip number
-- [ ] OpenAPI / Swagger documentation
+- [x] OpenAPI / Swagger documentation
 - [x] Dockerfile and one-command startup with `docker compose up --build`
-- [ ] Testcontainers, GitHub Actions CI and a deployed demo
+- [x] Testcontainers: integration tests run against a throw-away PostGIS container
+- [x] GitHub Actions CI
+- [ ] A deployed demo
 - [ ] Image upload with EXIF stripping
 - [ ] Rate limiting and abuse reporting
 
