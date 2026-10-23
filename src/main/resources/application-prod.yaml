@@ -1,0 +1,21 @@
+# Production profile, switched on with SPRING_PROFILES_ACTIVE=prod.
+#
+# Every secret must come from the environment. None of these placeholders has a
+# default, so the app refuses to start if a value is missing, instead of quietly
+# running with the development password or JWT key from application.yaml.
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      # Neon's free tier allows few connections, and one small instance needs few.
+      maximum-pool-size: 5
+
+jwt:
+  secret: ${JWT_SECRET}
+
+server:
+  # Azure Container Apps ends HTTPS at its ingress and forwards plain HTTP.
+  # Trusting X-Forwarded-* headers lets Swagger UI and redirects use https:// links.
+  forward-headers-strategy: framework

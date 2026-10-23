@@ -220,8 +220,23 @@ Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 - [x] Testcontainers: integration tests run against a throw-away PostGIS container
 - [x] GitHub Actions CI
 - [x] A deployed demo (free tier: Render + Neon)
+- [x] Continuous deployment to Azure Container Apps (GitHub Actions + OIDC)
 - [ ] Image upload with EXIF stripping
 - [ ] Rate limiting and abuse reporting
+
+## Deployment
+
+Every push to `main` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+1. **Test**: `./mvnw verify`, with the integration tests running against a throw-away PostGIS container (Testcontainers).
+2. **Build**: a Docker image is pushed to GitHub Container Registry, tagged with the commit SHA.
+3. **Deploy**: GitHub Actions logs in to Azure with **OIDC**, so no cloud keys are stored in GitHub. It rolls the new image out to **Azure Container Apps**, then a smoke test checks `/actuator/health`.
+
+At runtime the API runs on Azure Container Apps (HTTPS ingress, scale to zero) with **Neon** serverless PostgreSQL/PostGIS.
+Secrets (the database password and JWT key) are stored as Container Apps secrets, never in the image or the repository.
+The `prod` profile has no fallback values, so the app refuses to start if a secret is missing.
+
+Setup steps: [docs/deploy-azure.md](docs/deploy-azure.md).
 
 ## Project structure
 

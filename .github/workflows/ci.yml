@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege by default; jobs ask for more only where they need it.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,3 +26,73 @@ jobs:
       # so no database service is configured here.
       - name: Build and test
         run: ./mvnw -B verify
+
+  # Runs only after the tests pass, and only for pushes to main (never for pull requests).
+  build-image:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # push the image to GitHub Container Registry
+    outputs:
+      image: ${{ steps.name.outputs.image }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name (lower case, tagged with the commit SHA)
+        id: name
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.name.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-image
+    runs-on: ubuntu-latest
+    # The Azure identity trusts only this GitHub environment (see docs/deploy-azure.md).
+    environment: production
+    permissions:
+      contents: read
+      id-token: write # OIDC: swap a short-lived GitHub token for an Azure token, no stored keys
+
+    steps:
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy the new image
+        run: |
+          az containerapp update \
+            --name "${{ vars.AZURE_CONTAINERAPP }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ needs.build-image.outputs.image }}"
+
+      - name: Smoke test
+        run: |
+          FQDN=$(az containerapp show \
+            --name "${{ vars.AZURE_CONTAINERAPP }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --query properties.configuration.ingress.fqdn -o tsv)
+          # The app scales to zero when idle, so the first request may wait for a cold start.
+          curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors \
+            "https://${FQDN}/actuator/health"
+          echo
+          echo "Live at https://${FQDN}/swagger-ui.html"
