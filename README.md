@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/jiwei-wu/petmatch/actions/workflows/ci.yml/badge.svg)](https://github.com/jiwei-wu/petmatch/actions/workflows/ci.yml)
 
-> **Live demo:** https://petmatch-njjl.onrender.com/swagger-ui.html - the API runs on the Render free tier with a Neon Postgres database. The service sleeps after 15 minutes of inactivity, so the first request can take about a minute. Please register with a fake email and do not enter real personal data.
+> **Live demo:** https://petmatch.proudbay-ed1e88f1.germanywestcentral.azurecontainerapps.io/swagger-ui.html - the API runs on Azure Container Apps with a Neon Postgres database, deployed automatically from `main`. It scales to zero when idle, so the first request can take up to a minute. Please register with a fake email and do not enter real personal data.
 
 A backend that helps reunite lost pets with the people who spotted them. Owners post a **lost** report, passers-by post a **sighting**, and PetMatch finds the likely pairs: it filters by species, place and time with PostGIS, scores each pair with an explainable model, and tells both sides when a strong match appears.
 
@@ -219,7 +219,7 @@ Asynchronous behaviour is tested by polling with a timeout, not by fixed sleeps.
 - [x] Dockerfile and one-command startup with `docker compose up --build`
 - [x] Testcontainers: integration tests run against a throw-away PostGIS container
 - [x] GitHub Actions CI
-- [x] A deployed demo (free tier: Render + Neon)
+- [x] A deployed demo (first on Render, now Azure Container Apps + Neon)
 - [x] Continuous deployment to Azure Container Apps (GitHub Actions + OIDC)
 - [ ] Image upload with EXIF stripping
 - [ ] Rate limiting and abuse reporting
